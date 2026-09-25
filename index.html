@@ -211,11 +211,11 @@ var CONFIG = {
   COLS: 5, ROWS: 4,
   COLORS: [
     { id: 'pink',     name: 'Розовый',    icon: '♥', fill: '#ffb3d1', deep: '#ff5c9d', mod: 'Fan Love',    modRu: 'Любовь фанатов', modDesc: 'Каждый кристалл в коробке даёт +10% к ценности всех кристаллов на поле' },
-    { id: 'mint',     name: 'Мятный',     icon: '★', fill: '#a8f0d4', deep: '#1fbf8a', mod: 'Encore',      modRu: 'Анкор',          modDesc: 'Когда поле заполнится впервые — нижний ряд очищается, и бонус продолжается' },
-    { id: 'lavender', name: 'Лавандовый', icon: '☾', fill: '#d9c6ff', deep: '#9463ff', mod: 'Moonlight',   modRu: 'Лунный свет',    modDesc: 'Крупные кристаллы падают чаще: S40 / M40 / L20' },
-    { id: 'sky',      name: 'Небесный',   icon: '☁', fill: '#b5e0ff', deep: '#3a9ef0', mod: 'Cloud Burst', modRu: 'Облачный взрыв', modDesc: 'Множитель коробки x1.0 и растёт на +0.1 каждый спин' },
+    { id: 'mint',     name: 'Мятный',     icon: '★', fill: '#a8f0d4', deep: '#1fbf8a', mod: 'Encore',      modRu: 'Анкор',          modDesc: 'Когда поле заполнится впервые — нижний ряд очищается, бонус продолжается, а коробка дальше платит ×2' },
+    { id: 'lavender', name: 'Лавандовый', icon: '☾', fill: '#d9c6ff', deep: '#9463ff', mod: 'Moonlight',   modRu: 'Лунный свет',    modDesc: 'Крупные кристаллы падают чаще: S50 / M35 / L15' },
+    { id: 'sky',      name: 'Небесный',   icon: '☁', fill: '#b5e0ff', deep: '#3a9ef0', mod: 'Cloud Burst', modRu: 'Облачный взрыв', modDesc: 'Множитель коробки x1.0 и растёт на +0.04 каждый спин' },
     { id: 'yellow',   name: 'Жёлтый',     icon: '⚡', fill: '#fff09a', deep: '#e8ad00', mod: 'Flash',       modRu: 'Вспышка',        modDesc: 'Каждый спин молния перекрашивает один кристалл в цвет бонуса' },
-    { id: 'coral',    name: 'Коралловый', icon: '♛', fill: '#ffc2ae', deep: '#ff6f4d', mod: 'Spotlight',   modRu: 'Софит',          modDesc: 'Каждый спин одна клетка под софитом: кристалл из неё платит x5' }
+    { id: 'coral',    name: 'Коралловый', icon: '♛', fill: '#ffc2ae', deep: '#ff6f4d', mod: 'Spotlight',   modRu: 'Софит',          modDesc: 'Каждый спин одна клетка под софитом: кристалл из неё платит ×8' }
   ],
   SIZES: ['S', 'M', 'L'],
   // ---- base game ----
@@ -236,23 +236,24 @@ var CONFIG = {
     STACK_WEIGHTS: [60, 40],
     SIZE_WEIGHTS: [34, 36, 30],     // S/M/L on strips
   },
-  POT_CHANCE: 0.0094,                // chance each landed cell turns into its color's pot symbol
+  POT_CHANCE: 0.00345,                // chance each landed cell turns into its color's pot symbol
   // ---- pots ----
   POT_ADD_X: [1, 2, 3, 4, 5],       // value added to pot per pot symbol (x total bet)
   POT_ADD_WEIGHTS: [40, 26, 16, 11, 7],
   POT_SEED_X: 0,                    // pot value after it triggers (x total bet)
-  TRIGGER: { BASE: 0.0, PER_X: 0.00135, MAX: 0.6 }, // chance per pot symbol = min(MAX, BASE + PER_X * potValue/bet)
+  TRIGGER: { CHANCE: 1 / 200 },    // flat per-spin bonus chance; triggered pot is picked uniformly 1/6
   // ---- bonus ----
   BONUS: {
     COLS: 4, ROWS: 3,
     MAX_SPINS: 1000,               // invisible technical guard only (never shown)
-    P_LAND: { pink: 0.59, mint: 0.725, lavender: 0.59, sky: 0.59, yellow: 0.705, coral: 0.59 },
+    P_LAND: { pink: 0.503, mint: 0.61, lavender: 0.502, sky: 0.50, yellow: 0.631, coral: 0.503 },
     SIZE_WEIGHTS: [70, 25, 5],
-    SIZE_WEIGHTS_MOONLIGHT: [40, 40, 20],
-    VALUES_X: [0.2, 0.5, 2],       // crystal value S/M/L (x total bet)
+    SIZE_WEIGHTS_MOONLIGHT: [50, 35, 15],
+    VALUES_X: [0.68, 1.7, 6.8],       // crystal value S/M/L (x total bet)
     PINK_BOOST: 0.10,               // +10% of base value per crystal collected
-    SKY_START: 1.0, SKY_STEP: 0.1,
-    CORAL_MULT: 5
+    SKY_START: 1.0, SKY_STEP: 0.04,
+    MINT_ENCORES: 1, MINT_MULT_STEP: 1,   // Encore: max encores per bonus; box multiplier +STEP after each encore
+    CORAL_MULT: 8
   },
   // ---- pacing (ms; turbo halves) ----
   ANIM: {
@@ -325,7 +326,6 @@ var IG = (function () {
   }
 
   function potAddX(rng) { return C.POT_ADD_X[wpick(rng, C.POT_ADD_WEIGHTS)]; }
-  function triggerChance(potX) { return Math.min(C.TRIGGER.MAX, C.TRIGGER.BASE + C.TRIGGER.PER_X * potX); }
 
   // pots: array[6] of money values for this bet (mutated). forcedColor: idx or -1
   function spinBase(rng, bet, pots, forcedColor) {
@@ -345,12 +345,9 @@ var IG = (function () {
       pots[grid[x][y].c] += add;
       potSyms.push({ x: x, y: y, c: grid[x][y].c, add: add });
     }
-    // trigger check: random order over landed pot symbols, max one trigger
-    var trigger = -1, order = potSyms.slice();
-    for (var i = order.length - 1; i > 0; i--) { var j = rint(rng, i + 1), t = order[i]; order[i] = order[j]; order[j] = t; }
-    for (i = 0; i < order.length; i++) {
-      if (rng.next() < triggerChance(pots[order[i].c] / bet)) { trigger = order[i].c; break; }
-    }
+    // pure mystery trigger: flat per-spin chance, pot chosen uniformly (independent of landed symbols / pot sizes)
+    var trigger = -1;
+    if (rng.next() < C.TRIGGER.CHANCE) trigger = rint(rng, NC);
     if (forcedColor >= 0) trigger = forcedColor;
     var potValue = 0;
     if (trigger >= 0) { potValue = pots[trigger]; pots[trigger] = C.POT_SEED_X * bet; }
@@ -361,14 +358,14 @@ var IG = (function () {
   function newBonus(color, startBoxMoney, bet) {
     var B = C.BONUS;
     return { color: color, bet: bet, cells: new Array(B.COLS * B.ROWS).fill(null), boxX: startBoxMoney / bet, startX: startBoxMoney / bet,
-      spins: 0, collected: 0, encoreUsed: false, mult: 1, spot: -1, done: false };
+      spins: 0, collected: 0, encores: 0, mult: 1, spot: -1, done: false };
   }
   function snap(st) { return st.cells.map(function (c) { return c ? { c: c.c, s: c.s, base: c.base, value: c.value } : null; }); }
 
   function bonusStep(st, rng, rec) {
     var B = C.BONUS, n = st.cells.length, ev = [], T = st.color, id = C.COLORS[T].id, i;
     st.spins++;
-    st.mult = id === 'sky' ? B.SKY_START + B.SKY_STEP * (st.spins - 1) : 1;
+    st.mult = id === 'sky' ? B.SKY_START + B.SKY_STEP * (st.spins - 1) : id === 'mint' ? 1 + B.MINT_MULT_STEP * st.encores : 1;
     st.spot = id === 'coral' ? rint(rng, n) : -1;
     if (rec) ev.push({ type: 'start', spin: st.spins, mult: st.mult, spot: st.spot });
     function collect(i, cr, phase) {
@@ -409,10 +406,10 @@ var IG = (function () {
     // 3) full check
     var full = true;
     for (i = 0; i < n; i++) if (!st.cells[i]) { full = false; break; }
-    if (full && id === 'mint' && !st.encoreUsed) {
-      st.encoreUsed = true;
+    if (full && id === 'mint' && st.encores < B.MINT_ENCORES) {
+      st.encores++;
       for (i = n - B.COLS; i < n; i++) st.cells[i] = null;
-      if (rec) ev.push({ type: 'encore', snap: snap(st) });
+      if (rec) ev.push({ type: 'encore', snap: snap(st), n: st.encores, nextMult: 1 + B.MINT_MULT_STEP * st.encores });
     } else if (full || st.spins >= B.MAX_SPINS) {
       st.done = true;
       if (!full && typeof console !== 'undefined' && !IG_QUIET) console.warn('Idol Gems: bonus hit technical guard of ' + B.MAX_SPINS + ' spins');
@@ -428,7 +425,7 @@ var IG = (function () {
   }
 
   return { rebuildStrips: rebuildStrips, strips: function () { return STRIPS; }, mulberry32: mulberry32, rint: rint, wpick: wpick, colorIndex: colorIndex, evalLines: evalLines,
-    spinBase: spinBase, newBonus: newBonus, bonusStep: bonusStep, runBonus: runBonus, triggerChance: triggerChance, symValue: symValue };
+    spinBase: spinBase, newBonus: newBonus, bonusStep: bonusStep, runBonus: runBonus, symValue: symValue };
 })();
 // ==LOGIC-END==
 
@@ -782,10 +779,11 @@ var ASSETS = {
     var st = ev[0];
     Array.prototype.forEach.call(document.querySelectorAll('.bc.lit'), function (e) { e.classList.remove('lit'); var x = e.querySelector('.x5'); x && x.remove(); });
     Array.prototype.forEach.call(document.querySelectorAll('.beam'), function (e) { e.remove(); });
+    if (id === 'mint' && st.mult > 1) { var mb2 = $('multBadge'); mb2.style.display = 'block'; mb2.textContent = 'x' + fx(st.mult); }
     if (id === 'sky') { var mb = $('multBadge'); caption('☁ Множитель коробки x' + fx(st.mult), b.color); mb.textContent = 'x' + fx(st.mult); classPulse(mb, 'grow', 500); await wait(A.B_CAPTION + 150); }
     if (id === 'coral') {
-      caption('♛ Софит: эта клетка платит ×5', b.color);
-      var lc = $('bc' + st.spot); lc.classList.add('lit'); var x5 = document.createElement('div'); x5.className = 'x5'; x5.textContent = '×5'; lc.appendChild(x5);
+      caption('♛ Софит: эта клетка платит ×' + C.BONUS.CORAL_MULT, b.color);
+      var lc = $('bc' + st.spot); lc.classList.add('lit'); var x5 = document.createElement('div'); x5.className = 'x5'; x5.textContent = '×' + C.BONUS.CORAL_MULT; lc.appendChild(x5);
       var beam = document.createElement('div'); beam.className = 'beam'; var gr = $('bGrid'); var col_ = st.spot % 4, row = (st.spot / 4) | 0;
       beam.style.left = (col_ * BW - BW * 0.3) + 'px'; beam.style.width = (BW * 1.6) + 'px'; beam.style.top = (-BH * 0.6) + 'px'; beam.style.height = (row * BH + BH * 1.6) + 'px';
       gr.appendChild(beam);
@@ -842,12 +840,13 @@ var ASSETS = {
     if (pe) { renderBonusCells(pe.snap); renderFill(pe.snap); }
     var enc = ev.filter(function (e) { return e.type === 'encore'; })[0];
     if (enc) {
-      caption('★ Encore! Нижний ряд очищен', b.color);
+      caption('★ Encore! Нижний ряд очищен, коробка ×' + fx(enc.nextMult), b.color);
       await bigMsg('Поле заполнено!', A.B_FULL * 0.7);
       await Promise.all([8, 9, 10, 11].map(function (i) { var g = $('bc' + i).querySelector('.slot'); return anim(g, [{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(1.3) rotate(10deg)', opacity: 0 }], A.B_ENCORE / 2); }));
       renderBonusCells(enc.snap); renderFill(enc.snap);
       [8, 9, 10, 11].forEach(function (i) { $('bc' + i).querySelector('.slot').getAnimations().forEach(function (a) { a.cancel(); }); });
-      await bigMsg('Encore!<br><span style="font-size:18px">Нижний ряд очищен</span>', A.B_ENCORE);
+      var mb3 = $('multBadge'); mb3.style.display = 'block'; mb3.textContent = 'x' + fx(enc.nextMult); classPulse(mb3, 'grow', 500);
+      await bigMsg('Encore!<br><span style="font-size:18px">Нижний ряд очищен<br>Коробка ×' + fx(enc.nextMult) + '</span>', A.B_ENCORE);
     }
     var end = ev.filter(function (e) { return e.type === 'end'; })[0];
     if (end) {
