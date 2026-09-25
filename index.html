@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#ffc9e0">
-<title>Idol Gems — прототип</title>
+<title>Idol Gems — prototype</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;overscroll-behavior:none}
@@ -38,7 +38,13 @@ body{font-family:"Nunito","Trebuchet MS","Segoe UI",system-ui,-apple-system,Robo
 .pot .jar{position:absolute;left:6%;right:6%;top:11%;bottom:0;border-radius:42% 42% 36% 36%/34% 34% 46% 46%;
  background:radial-gradient(ellipse 55% 35% at 32% 26%,rgba(255,255,255,.95),rgba(255,255,255,0) 70%),linear-gradient(180deg,rgba(255,255,255,.55),var(--f) 95%);
  border:2px solid rgba(255,255,255,.95);box-shadow:0 3px 8px rgba(160,60,120,.25),inset 0 -6px 10px rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;overflow:hidden}
-.pot .jar .gem{width:62%;height:62%}
+.pot .jar .gem{width:62%;height:62%;position:relative;z-index:2}
+.pot .liq{position:absolute;left:0;right:0;bottom:0;height:6%;z-index:1;transition:height .6s cubic-bezier(.3,1.3,.5,1);background:linear-gradient(180deg,color-mix(in srgb,var(--d) 70%,#fff),var(--d));opacity:.95;border-top:2px solid rgba(255,255,255,.9)}
+.pot .liq i{position:absolute;inset:0;background:radial-gradient(circle at 25% 35%,#fff 0 1.5px,transparent 2.5px),radial-gradient(circle at 70% 60%,#fff 0 1.5px,transparent 2.5px),radial-gradient(circle at 45% 80%,#fff 0 1px,transparent 2px);background-size:18px 16px;animation:fizz 2s linear infinite;opacity:.9}
+@keyframes fizz{to{background-position:0 -32px}}
+.pot.full .jar{box-shadow:0 0 12px 4px var(--d),0 0 0 2px #fff;animation:fullglow 1.2s ease-in-out infinite alternate}
+.pot.full::after{content:'✦';position:absolute;right:4%;top:14%;color:#fff;font-size:14px;text-shadow:0 0 6px var(--d);z-index:4;animation:twk 1.2s linear infinite}
+@keyframes fullglow{to{filter:brightness(1.12)}}
 .pot .val{position:absolute;left:50%;bottom:-3px;transform:translateX(-50%);min-width:88%;text-align:center;font-size:12px;font-weight:900;color:#fff;background:linear-gradient(180deg,var(--d),color-mix(in srgb,var(--d) 70%,#7a2e5a));border-radius:9px;padding:1px 4px;border:1.5px solid #fff;white-space:nowrap;z-index:3;text-shadow:0 1px 0 rgba(0,0,0,.2)}
 .potW.armed .pot{animation:armed 0.9s ease-in-out infinite}
 .potW.armed .jar{box-shadow:0 0 16px 6px var(--d),0 0 0 3px #fff}
@@ -55,7 +61,7 @@ body{font-family:"Nunito","Trebuchet MS","Segoe UI",system-ui,-apple-system,Robo
 /* caption + stage */
 #caption{width:100%;min-height:30px;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:900;font-size:15px;color:#b0206f;text-shadow:0 1px 0 #fff;margin:2px 0}
 #caption span{background:rgba(255,255,255,.75);border:2px solid #fff;border-radius:16px;padding:3px 12px;box-shadow:0 2px 6px rgba(176,32,111,.18)}
-#caption span{display:inline-flex;align-items:center;gap:6px}
+#caption span{display:inline-flex;align-items:center;gap:6px;max-width:100%}
 #caption .cg{width:24px;height:24px;flex:none}
 #caption span.pop{animation:cappop .3s}
 @keyframes cappop{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
@@ -83,7 +89,7 @@ body{font-family:"Nunito","Trebuchet MS","Segoe UI",system-ui,-apple-system,Robo
 .gem{position:relative;display:flex;align-items:center;justify-content:center;pointer-events:none}
 .gem img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(140,40,100,.25))}
 .gem{aspect-ratio:1/1}.gem.g0{width:min(64%,calc(var(--ch)*.6))}.gem.g1{width:min(80%,calc(var(--ch)*.76))}.gem.g2{width:min(96%,calc(var(--ch)*.9))}
-.pot .jar .gem{width:62%;height:auto}
+.pot .jar .gem{width:50%;height:auto}
 .gem .sz{position:absolute;right:-4%;bottom:-6%;font-style:normal;font-size:10px;font-weight:900;color:#fff;background:var(--d);border:1.5px solid #fff;border-radius:6px;padding:0 3px;line-height:13px}
 .gem.pot::before{content:"";position:absolute;inset:-18%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.95) 0%,var(--f) 40%,transparent 70%);animation:potglow 1s ease-in-out infinite alternate}
 .gem.pot img{position:relative}
@@ -179,7 +185,7 @@ body.inBonus #bonus{display:flex}body.inBonus #baseWrap{display:none}
 <body>
 <div id="bg"></div><div id="tint"></div>
 <div id="app">
-  <div id="info"><div id="balBox">Баланс: <b id="bal">0.00</b></div><div>Выигрыш: <b id="lastWin">0.00</b></div></div>
+  <div id="info"><div id="balBox">Balance: <b id="bal">0.00</b></div><div>Win: <b id="lastWin">0.00</b></div></div>
   <div id="pots"></div>
   <div id="caption"><span>Idol Gems</span></div>
   <div id="stage">
@@ -187,35 +193,35 @@ body.inBonus #bonus{display:flex}body.inBonus #baseWrap{display:none}
     <div id="bonus">
       <div id="bRow">
         <div id="bFrame" class="frame"><div id="bGrid"></div></div>
-        <div id="bFill"><div class="lab">Клетки</div><div id="fillCells"></div><div class="cnt" id="fillCnt">0/12</div></div>
+        <div id="bFill"><div class="lab">Cells</div><div id="fillCells"></div><div class="cnt" id="fillCnt">0/12</div></div>
       </div>
       <div id="bBottom">
         <div id="giftBox"><div class="glid"></div><div class="gbody"></div><div class="bow"><i></i></div><div id="multBadge">x1.0</div></div>
-        <div id="boxPanel"><div class="lab">Коробка фанатов</div><div class="v" id="boxV">0.00</div><div class="x" id="boxX">0.0× ставки</div></div>
+        <div id="boxPanel"><div class="lab">Fan Box</div><div class="v" id="boxV">0.00</div><div class="x" id="boxX">0.0× bet</div></div>
       </div>
     </div>
   </div>
-  <div id="hint">Тапни, чтобы крутить</div>
+  <div id="hint">Tap to spin</div>
 </div>
 <div id="bonusFlash"><div>BONUS!</div></div>
 <div class="ov" id="ovIntro"><div class="card" id="introCard"></div></div>
 <div class="ov" id="ovSum"><div class="card" id="sumCard"></div></div>
-<div class="ov" id="dbg"><div class="card"><h2>Отладка</h2><p id="dbgInfo"></p><button id="dbgReset">Сбросить баланс (1000)</button><button id="dbgPots">Обнулить банки</button><button id="dbgTurbo">Турбо: выкл</button><button id="dbgClose">Закрыть</button><p style="font-size:12px">Чит: тапни по банку — следующий спин запустит его бонус.</p></div></div>
+<div class="ov" id="dbg"><div class="card"><h2>Debug</h2><p id="dbgInfo"></p><button id="dbgReset">Reset balance (1000)</button><button id="dbgPots">Empty all jars</button><button id="dbgTurbo">Turbo: off</button><button id="dbgClose">Close</button><p style="font-size:12px">Cheat: tap a pot — the next spin triggers its bonus.</p></div></div>
 <div id="toast"></div>
 <script>
 // ==LOGIC-START== (shared with sim.js — do not put DOM code in this block)
 var CONFIG = {
   START_BALANCE: 1000,
   BETS: [1, 2, 5, 10],
-  STORAGE_KEY: 'idolGems_proto_v1',
+  STORAGE_KEY: 'idolGems_proto_v2',
   COLS: 5, ROWS: 4,
   COLORS: [
-    { id: 'pink',     name: 'Розовый',    icon: '♥', fill: '#ffb3d1', deep: '#ff5c9d', mod: 'Fan Love',    modRu: 'Любовь фанатов', modDesc: 'Каждый кристалл в коробке даёт +10% к ценности всех кристаллов на поле' },
-    { id: 'mint',     name: 'Мятный',     icon: '★', fill: '#a8f0d4', deep: '#1fbf8a', mod: 'Encore',      modRu: 'Анкор',          modDesc: 'Когда поле заполнится впервые — нижний ряд очищается, бонус продолжается, а коробка дальше платит ×2' },
-    { id: 'lavender', name: 'Лавандовый', icon: '☾', fill: '#d9c6ff', deep: '#9463ff', mod: 'Moonlight',   modRu: 'Лунный свет',    modDesc: 'Крупные кристаллы падают чаще: S50 / M35 / L15' },
-    { id: 'sky',      name: 'Небесный',   icon: '☁', fill: '#b5e0ff', deep: '#3a9ef0', mod: 'Cloud Burst', modRu: 'Облачный взрыв', modDesc: 'Множитель коробки x1.0 и растёт на +0.04 каждый спин' },
-    { id: 'yellow',   name: 'Жёлтый',     icon: '⚡', fill: '#fff09a', deep: '#e8ad00', mod: 'Flash',       modRu: 'Вспышка',        modDesc: 'Каждый спин молния перекрашивает один кристалл в цвет бонуса' },
-    { id: 'coral',    name: 'Коралловый', icon: '♛', fill: '#ffc2ae', deep: '#ff6f4d', mod: 'Spotlight',   modRu: 'Софит',          modDesc: 'Каждый спин одна клетка под софитом: кристалл из неё платит ×8' }
+    { id: 'pink',     name: 'Pink',    icon: '♥', fill: '#ffb3d1', deep: '#ff5c9d', mod: 'Fan Love', modDesc: 'Every crystal in the box gives all crystals on the grid +10% value' },
+    { id: 'mint',     name: 'Mint',     icon: '★', fill: '#a8f0d4', deep: '#1fbf8a', mod: 'Encore',          modDesc: 'When the grid fills the first time, the bottom row clears, play goes on and the box pays ×2' },
+    { id: 'lavender', name: 'Lavender', icon: '☾', fill: '#d9c6ff', deep: '#9463ff', mod: 'Moonlight',    modDesc: 'Big crystals drop more often: S50 / M35 / L15' },
+    { id: 'sky',      name: 'Sky',   icon: '☁', fill: '#b5e0ff', deep: '#3a9ef0', mod: 'Cloud Burst', modDesc: 'Box multiplier starts at x1.0 and grows +0.04 every spin' },
+    { id: 'yellow',   name: 'Yellow',     icon: '⚡', fill: '#fff09a', deep: '#e8ad00', mod: 'Flash',        modDesc: 'Every spin, lightning turns one crystal into the bonus color' },
+    { id: 'coral',    name: 'Coral', icon: '♛', fill: '#ffc2ae', deep: '#ff6f4d', mod: 'Spotlight',          modDesc: 'Every spin one cell is in the spotlight: its crystal pays ×8' }
   ],
   SIZES: ['S', 'M', 'L'],
   // ---- base game ----
@@ -237,10 +243,10 @@ var CONFIG = {
     SIZE_WEIGHTS: [34, 36, 30],     // S/M/L on strips
   },
   POT_CHANCE: 0.00345,                // chance each landed cell turns into its color's pot symbol
-  // ---- pots ----
-  POT_ADD_X: [1, 2, 3, 4, 5],       // value added to pot per pot symbol (x total bet)
-  POT_ADD_WEIGHTS: [40, 26, 16, 11, 7],
-  POT_SEED_X: 0,                    // pot value after it triggers (x total bet)
+  // ---- pots (PURELY VISUAL: fill level 0..1, never paid, never affects any win) ----
+  POT_FILL_UNITS: [1, 2, 3, 4, 5],  // fill units added to the jar per pot symbol
+  POT_FILL_WEIGHTS: [40, 26, 16, 11, 7],
+  POT_FILL_PER_UNIT: 0.05,          // jar fill per unit (1 = full); capped at 1
   TRIGGER: { CHANCE: 1 / 200 },    // flat per-spin bonus chance; triggered pot is picked uniformly 1/6
   // ---- bonus ----
   BONUS: {
@@ -249,7 +255,7 @@ var CONFIG = {
     P_LAND: { pink: 0.503, mint: 0.61, lavender: 0.502, sky: 0.50, yellow: 0.631, coral: 0.503 },
     SIZE_WEIGHTS: [70, 25, 5],
     SIZE_WEIGHTS_MOONLIGHT: [50, 35, 15],
-    VALUES_X: [0.68, 1.7, 6.8],       // crystal value S/M/L (x total bet)
+    VALUES_X: [0.96, 2.4, 9.6],       // crystal value S/M/L (x total bet)
     PINK_BOOST: 0.10,               // +10% of base value per crystal collected
     SKY_START: 1.0, SKY_STEP: 0.04,
     MINT_ENCORES: 1, MINT_MULT_STEP: 1,   // Encore: max encores per bonus; box multiplier +STEP after each encore
@@ -325,10 +331,10 @@ var IG = (function () {
     return { wins: wins, total: total };
   }
 
-  function potAddX(rng) { return C.POT_ADD_X[wpick(rng, C.POT_ADD_WEIGHTS)]; }
+  function potFillAdd(rng) { return C.POT_FILL_UNITS[wpick(rng, C.POT_FILL_WEIGHTS)] * C.POT_FILL_PER_UNIT; }
 
-  // pots: array[6] of money values for this bet (mutated). forcedColor: idx or -1
-  function spinBase(rng, bet, pots, forcedColor) {
+  // fills: array[6] of visual jar fill levels 0..1 (mutated; cosmetic only). forcedColor: idx or -1
+  function spinBase(rng, bet, fills, forcedColor) {
     var stops = [], grid = [];
     for (var x = 0; x < C.COLS; x++) {
       var st = STRIPS[x], p = rint(rng, st.length), col = [];
@@ -341,23 +347,22 @@ var IG = (function () {
     var lines = evalLines(grid, bet);
     var potSyms = [];
     for (x = 0; x < C.COLS; x++) for (y = 0; y < C.ROWS; y++) if (grid[x][y].s === 3) {
-      var add = potAddX(rng) * bet;
-      pots[grid[x][y].c] += add;
+      var add = potFillAdd(rng);
+      fills[grid[x][y].c] = Math.min(1, fills[grid[x][y].c] + add);
       potSyms.push({ x: x, y: y, c: grid[x][y].c, add: add });
     }
     // pure mystery trigger: flat per-spin chance, pot chosen uniformly (independent of landed symbols / pot sizes)
     var trigger = -1;
     if (rng.next() < C.TRIGGER.CHANCE) trigger = rint(rng, NC);
     if (forcedColor >= 0) trigger = forcedColor;
-    var potValue = 0;
-    if (trigger >= 0) { potValue = pots[trigger]; pots[trigger] = C.POT_SEED_X * bet; }
-    return { stops: stops, grid: grid, lineWins: lines.wins, lineTotal: lines.total, potSyms: potSyms, trigger: trigger, triggerPot: potValue };
+    if (trigger >= 0) fills[trigger] = 0; // visual drain only
+    return { stops: stops, grid: grid, lineWins: lines.wins, lineTotal: lines.total, potSyms: potSyms, trigger: trigger };
   }
 
   // ---------- bonus ----------
-  function newBonus(color, startBoxMoney, bet) {
+  function newBonus(color, bet) {
     var B = C.BONUS;
-    return { color: color, bet: bet, cells: new Array(B.COLS * B.ROWS).fill(null), boxX: startBoxMoney / bet, startX: startBoxMoney / bet,
+    return { color: color, bet: bet, cells: new Array(B.COLS * B.ROWS).fill(null), boxX: 0,
       spins: 0, collected: 0, encores: 0, mult: 1, spot: -1, done: false };
   }
   function snap(st) { return st.cells.map(function (c) { return c ? { c: c.c, s: c.s, base: c.base, value: c.value } : null; }); }
@@ -418,8 +423,8 @@ var IG = (function () {
     return ev;
   }
 
-  function runBonus(color, startBoxMoney, bet, rng, rec) {
-    var st = newBonus(color, startBoxMoney, bet), steps = [];
+  function runBonus(color, bet, rng, rec) { // box always starts at 0
+    var st = newBonus(color, bet), steps = [];
     while (!st.done) { var e = bonusStep(st, rng, rec); if (rec) steps.push({ spin: st.spins, events: e }); }
     return { state: st, steps: steps, win: Math.round(st.boxX * bet * 100) / 100 };
   }
@@ -469,7 +474,7 @@ var ASSETS = {
   var forcedParam = qs.has('bonus') ? IG.colorIndex(qs.get('bonus')) : -1;
   if (forcedParam >= 0) S.armed = forcedParam;
   function bet() { return C.BETS[BET_INDEX]; }
-  function pots() { var b = bet(); if (!S.pots[b]) S.pots[b] = new Array(NC).fill(C.POT_SEED_X * b); return S.pots[b]; }
+  function pots() { var b = bet(); if (!S.pots[b]) S.pots[b] = new Array(NC).fill(0); return S.pots[b]; } // visual jar fill levels 0..1
   var dispPots = null;
   function r2(x) { return Math.round(x * 100) / 100; }
   function fm(x) { return (Math.round(x * 100) / 100).toFixed(2); }
@@ -481,7 +486,7 @@ var ASSETS = {
   function load() {
     try {
       var d = JSON.parse(localStorage.getItem(C.STORAGE_KEY) || 'null');
-      if (d) { S.balance = +d.balance || 0; S.pots = d.pots || {}; if (d.pending && d.pending.win > 0) { S.balance = r2(S.balance + d.pending.win); setTimeout(function () { toast('Незавершённый бонус зачислен: +' + fm(d.pending.win)); }, 400); } }
+      if (d) { S.balance = +d.balance || 0; S.pots = d.pots || {}; if (d.pending && d.pending.win > 0) { S.balance = r2(S.balance + d.pending.win); setTimeout(function () { toast('Unfinished bonus credited: +' + fm(d.pending.win)); }, 400); } }
     } catch (e) {}
     S.pending = null;
   }
@@ -509,7 +514,7 @@ var ASSETS = {
     var sz = s === 3 ? 1 : s, cc = col(c), key = cc.id + '_' + C.SIZES[sz];
     var src = (typeof ASSETS !== 'undefined' && ASSETS.gems && ASSETS.gems[key]) || null;
     var inner = src ? '<img src="' + src + '" alt="" draggable="false">' : '<div class="ph"><b>' + cc.icon + '</b></div>';
-    var deco = s === 3 ? '<i class="spark a">✦</i><i class="spark b">✦</i><i class="potTag">БАНК</i>' : (extra && extra.noSize ? '' : '<i class="sz">' + C.SIZES[sz] + '</i>');
+    var deco = s === 3 ? '<i class="spark a">✦</i><i class="spark b">✦</i><i class="potTag">POT</i>' : (extra && extra.noSize ? '' : '<i class="sz">' + C.SIZES[sz] + '</i>');
     return '<div class="gem g' + sz + (s === 3 ? ' pot' : '') + '" style="--f:' + cc.fill + ';--d:' + cc.deep + '">' + inner + deco + '</div>';
   }
 
@@ -534,15 +539,15 @@ var ASSETS = {
   // ---------- pots ----------
   function buildPots() {
     var h = '';
-    for (var c = 0; c < NC; c++) h += '<div class="potW" data-c="' + c + '" style="--f:' + col(c).fill + ';--d:' + col(c).deep + '"><div class="pot" id="pot' + c + '"><div class="lid"></div><div class="jar">' + gemHTML(c, 1, { noSize: 1 }) + '</div><div class="val" id="potv' + c + '">0</div></div><div class="armTag">следующий спин<br>= бонус</div></div>';
+    for (var c = 0; c < NC; c++) h += '<div class="potW" data-c="' + c + '" style="--f:' + col(c).fill + ';--d:' + col(c).deep + '"><div class="pot" id="pot' + c + '"><div class="lid"></div><div class="jar"><div class="liq" id="potl' + c + '"><i></i></div>' + gemHTML(c, 1, { noSize: 1 }) + '</div></div><div class="armTag">Next spin<br>= BONUS</div></div>';
     $('pots').innerHTML = h;
     Array.prototype.forEach.call(document.querySelectorAll('.potW'), function (el) {
       el.addEventListener('pointerup', function (e) { e.stopPropagation(); e.preventDefault(); if (S.mode !== 'idle' || S.busy) return; var c = +el.dataset.c; S.armed = S.armed === c ? -1 : c; renderArm(); });
       el.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
     });
   }
-  function potLabel(v) { var x = v / bet(); return x >= 1000 ? Math.round(x) + '' : fm(v); }
-  function renderPots() { for (var c = 0; c < NC; c++) $('potv' + c).textContent = potLabel(dispPots[c]); }
+  function renderPot(c) { var f = Math.max(0, Math.min(1, dispPots[c] || 0)); $('potl' + c).style.height = (6 + f * 88).toFixed(1) + '%'; $('pot' + c).classList.toggle('full', f >= 0.999); }
+  function renderPots() { for (var c = 0; c < NC; c++) renderPot(c); }
   function renderArm() { Array.prototype.forEach.call(document.querySelectorAll('.potW'), function (el) { el.classList.toggle('armed', +el.dataset.c === S.armed); }); }
   function tickNum(el, from, to, ms, fmt) {
     return new Promise(function (res) {
@@ -563,8 +568,8 @@ var ASSETS = {
   function hint() {
     var h = $('hint'), on = false;
     if (!S.busy) {
-      if (S.mode === 'idle' && S.baseSpins < C.ANIM.HINT_BASE_SPINS) { on = true; h.textContent = 'Тапни, чтобы крутить'; }
-      if (S.mode === 'bonusIdle' && S.bonusSpins < C.ANIM.HINT_BONUS_SPINS) { on = true; h.textContent = 'Тапни — следующий спин бонуса'; }
+      if (S.mode === 'idle' && S.baseSpins < C.ANIM.HINT_BASE_SPINS) { on = true; h.textContent = 'Tap to spin'; }
+      if (S.mode === 'bonusIdle' && S.bonusSpins < C.ANIM.HINT_BONUS_SPINS) { on = true; h.textContent = 'Tap for the next bonus spin'; }
     }
     h.classList.toggle('on', on);
   }
@@ -634,10 +639,10 @@ var ASSETS = {
   }
 
   async function baseSpin() {
-    if (S.balance < bet()) { S.balance = C.START_BALANCE; save(); renderInfo(); toast('Баланс пуст — пополнили до ' + C.START_BALANCE + ' (игровые деньги)'); return; }
+    if (S.balance < bet()) { S.balance = C.START_BALANCE; save(); renderInfo(); toast('Out of coins — refilled to ' + C.START_BALANCE + ' (play money)'); return; }
     setBusy(true); setMode('spinning'); clearWins();
     S.balance = r2(S.balance - bet()); S.lastWin = 0; renderInfo();
-    caption('Удачи! ✨');
+    caption('Good luck! ✨');
     var armed = S.armed; S.armed = -1;
     var P = pots(), res = IG.spinBase(rng, bet(), P, armed);
     // if the armed pot has no pot symbol on screen, the cheat still triggers through the same animation
@@ -645,11 +650,11 @@ var ASSETS = {
     S.baseSpins++;
     // pot symbols -> sparkle to pot, pot ticks up
     if (res.potSyms.length) {
-      caption('Банк пополняется!');
+      caption('Pot filling up!');
       await Promise.all(res.potSyms.map(function (ps) {
         return sparkTo(cellEl(ps.x, ps.y), $('pot' + ps.c), ps.c, C.ANIM.POT_FLY).then(function () {
-          var from = dispPots[ps.c]; dispPots[ps.c] = from + ps.add; classPulse($('pot' + ps.c), 'bump', 350);
-          return tickNum($('potv' + ps.c), from, dispPots[ps.c], 300, potLabel);
+          dispPots[ps.c] = Math.min(1, dispPots[ps.c] + ps.add); renderPot(ps.c); classPulse($('pot' + ps.c), 'bump', 350);
+          return wait(200);
         });
       }));
     }
@@ -659,41 +664,41 @@ var ASSETS = {
       var per = Math.min(C.ANIM.LINE_SHOW, C.ANIM.LINE_TOTAL_MAX / res.lineWins.length);
       for (var i = 0; i < res.lineWins.length && !SKIP; i++) {
         var w = res.lineWins[i];
-        showLine(w); caption('Линия ' + (w.line + 1) + ': ' + w.count + '× ' + col(w.color).icon + ' = +' + fm(w.amount), w.color);
+        showLine(w); caption('Line ' + (w.line + 1) + ': ' + w.count + '× ' + col(w.color).icon + ' = +' + fm(w.amount), w.color);
         await wait(per);
       }
       clearWins();
       res.lineWins.forEach(function (w) { w.cells.forEach(function (p) { cellEl(p[0], p[1]).classList.add('win'); }); });
       S.balance = r2(S.balance + res.lineTotal); S.lastWin = r2(res.lineTotal); renderInfo();
-      caption('Выигрыш: +' + fm(res.lineTotal) + (res.lineWins.length > 1 ? ' (' + res.lineWins.length + ' лин.)' : ''));
-    } else caption(res.trigger >= 0 ? '…' : 'Тапни ещё раз!');
+      caption('Win: +' + fm(res.lineTotal) + (res.lineWins.length > 1 ? ' (' + res.lineWins.length + ' lines)' : ''));
+    } else caption(res.trigger >= 0 ? '…' : 'Tap again!');
     save();
-    if (res.trigger >= 0) { await triggerBonus(res.trigger, res.triggerPot); return; }
+    if (res.trigger >= 0) { await triggerBonus(res.trigger); return; }
     dispPots = P.slice(); renderPots();
     setMode('idle'); setBusy(false);
   }
 
   // ---------- bonus trigger / intro ----------
-  async function triggerBonus(c, potValue) {
+  async function triggerBonus(c) {
     SKIP = false;
     var pot = $('pot' + c), cc = col(c);
-    caption('Банк ' + cc.icon + ' проснулся…', c);
+    caption(cc.name + ' pot is waking up…', c);
     pot.classList.add('shake', 'glow'); await wait(C.ANIM.TRIGGER_POT * 0.6);
-    pot.classList.remove('shake'); pot.classList.add('open'); await wait(C.ANIM.TRIGGER_POT * 0.4);
+    pot.classList.remove('shake'); pot.classList.add('open'); await wait(C.ANIM.TRIGGER_POT * 0.25);
+    dispPots[c] = 0; renderPot(c); await wait(C.ANIM.TRIGGER_POT * 0.35); // jar drains (visual only)
     setTheme(c);
     var bf = $('bonusFlash'); bf.classList.add('on'); bf.firstChild.style.animation = 'none'; void bf.offsetWidth; bf.firstChild.style.animation = '';
     await wait(C.ANIM.BANNER);
     bf.classList.remove('on');
-    dispPots[c] = pots()[c]; renderPots();
     setTimeout(function () { pot.classList.remove('glow', 'open'); }, 600);
     // precompute the whole bonus (deterministic), store pending payout in case the page is closed mid-bonus
-    var run = IG.runBonus(c, potValue, bet(), rng, true);
-    S.bonus = { color: c, run: run, step: 0, pot: potValue, box: potValue / bet(), cells: new Array(12).fill(null) };
+    var run = IG.runBonus(c, bet(), rng, true);
+    S.bonus = { color: c, run: run, step: 0, box: 0, cells: new Array(12).fill(null) };
     S.pending = { win: run.win }; save();
     $('introCard').innerHTML = '<h1>BONUS!</h1>' + gemHTML(c, 2, { noSize: 1 }) + '<h2>' + cc.name + ' ' + cc.icon + '</h2>' +
-      '<p>Кристаллы цвета «' + cc.name + '» улетают в коробку. Остальные перекрашиваются каждый спин. Бонус идёт, пока поле не заполнится.</p>' +
-      '<div class="mod"><b>' + cc.icon + ' ' + cc.mod + ' — ' + cc.modRu + '</b><p>' + cc.modDesc + '</p></div>' +
-      '<p>В коробке уже: <b>' + fm(potValue) + '</b> (из банка)</p><div class="tapc">Тапни, чтобы начать</div>';
+      '<p>' + cc.name + ' crystals fly into the box. Others change color every spin. The bonus runs until the grid is full.</p>' +
+      '<div class="mod"><b>' + cc.icon + ' ' + cc.mod + '</b><p>' + cc.modDesc + '</p></div>' +
+      '<div class="tapc">Tap to start</div>';
     $('ovIntro').classList.add('on');
     setMode('bonusIntro'); setBusy(false);
   }
@@ -704,10 +709,10 @@ var ASSETS = {
     var b = S.bonus, cc = col(b.color);
     document.body.classList.add('inBonus'); S.bonusSpins = 0;
     buildBonusGrid(); renderBonusCells(b.cells); renderFill(b.cells);
-    $('boxV').textContent = fm(b.box * bet()); $('boxX').textContent = fx(b.box) + '× ставки';
+    $('boxV').textContent = fm(b.box * bet()); $('boxX').textContent = fx(b.box) + '× bet';
     var mb = $('multBadge'); mb.style.display = cc.id === 'sky' ? 'block' : 'none'; mb.textContent = 'x1.0';
     layout();
-    caption('Собирай кристаллы «' + cc.name + '»!', b.color);
+    caption('Collect ' + cc.name + ' crystals!', b.color);
     setMode('bonusIdle');
     bonusSpin();
   }
@@ -758,11 +763,11 @@ var ASSETS = {
     var mtxt = ev.mult > 1.0001 ? ' ×' + fx(ev.mult) : '';
     floatText('+' + fx(ev.value) + '×' + ' (+' + fm(ev.value * bet()) + ')' + mtxt, t.x, t.y - 40);
     var from = b.box; b.box = ev.box;
-    tickNum($('boxX'), from, b.box, 300, function (v) { return fx(v) + '× ставки'; });
+    tickNum($('boxX'), from, b.box, 300, function (v) { return fx(v) + '× bet'; });
     await tickNum($('boxV'), from * bet(), b.box * bet(), 300, fm);
   }
   async function pinkTick(snap, n) {
-    caption('♥ Любовь фанатов: +' + (10 * n) + '% всем', S.bonus.color);
+    caption('♥ Fan Love: +' + (10 * n) + '% to all', S.bonus.color);
     var ps = [];
     for (var i = 0; i < 12; i++) if (snap[i]) {
       var el = $('bc' + i), v = el.querySelector('.bval');
@@ -780,9 +785,9 @@ var ASSETS = {
     Array.prototype.forEach.call(document.querySelectorAll('.bc.lit'), function (e) { e.classList.remove('lit'); var x = e.querySelector('.x5'); x && x.remove(); });
     Array.prototype.forEach.call(document.querySelectorAll('.beam'), function (e) { e.remove(); });
     if (id === 'mint' && st.mult > 1) { var mb2 = $('multBadge'); mb2.style.display = 'block'; mb2.textContent = 'x' + fx(st.mult); }
-    if (id === 'sky') { var mb = $('multBadge'); caption('☁ Множитель коробки x' + fx(st.mult), b.color); mb.textContent = 'x' + fx(st.mult); classPulse(mb, 'grow', 500); await wait(A.B_CAPTION + 150); }
+    if (id === 'sky') { var mb = $('multBadge'); caption('☁ Box multiplier x' + fx(st.mult), b.color); mb.textContent = 'x' + fx(st.mult); classPulse(mb, 'grow', 500); await wait(A.B_CAPTION + 150); }
     if (id === 'coral') {
-      caption('♛ Софит: эта клетка платит ×' + C.BONUS.CORAL_MULT, b.color);
+      caption('♛ Spotlight: this cell pays ×' + C.BONUS.CORAL_MULT, b.color);
       var lc = $('bc' + st.spot); lc.classList.add('lit'); var x5 = document.createElement('div'); x5.className = 'x5'; x5.textContent = '×' + C.BONUS.CORAL_MULT; lc.appendChild(x5);
       var beam = document.createElement('div'); beam.className = 'beam'; var gr = $('bGrid'); var col_ = st.spot % 4, row = (st.spot / 4) | 0;
       beam.style.left = (col_ * BW - BW * 0.3) + 'px'; beam.style.width = (BW * 1.6) + 'px'; beam.style.top = (-BH * 0.6) + 'px'; beam.style.height = (row * BH + BH * 1.6) + 'px';
@@ -792,7 +797,7 @@ var ASSETS = {
     // 1) re-roll: flip each locked crystal to its new color
     var rer = ev.filter(function (e) { return e.type === 'reroll'; });
     if (rer.length) {
-      caption('Перекраска…', b.color); await wait(A.B_CAPTION);
+      caption('Recolor…', b.color); await wait(A.B_CAPTION);
       await Promise.all(rer.map(function (e, n) {
         var el = $('bc' + e.cell), slot = el.querySelector('.slot');
         return wait(n * 35).then(function () { return anim(slot, [{ transform: 'rotateY(0)' }, { transform: 'rotateY(90deg)' }], A.B_FLIP / 2, { easing: 'ease-in' }); }).then(function () {
@@ -805,7 +810,7 @@ var ASSETS = {
     // 1b) yellow flash
     var fl = ev.filter(function (e) { return e.type === 'flash'; })[0];
     if (fl) {
-      caption('⚡ Молния!', b.color);
+      caption('⚡ Lightning!', b.color);
       var fe = $('bc' + fl.cell), bolt = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       var c2 = fl.cell % 4, r2_ = (fl.cell / 4) | 0, bh = r2_ * BH + BH * 0.7 + 40;
       bolt.setAttribute('class', 'bolt'); bolt.setAttribute('viewBox', '0 0 40 100'); bolt.setAttribute('preserveAspectRatio', 'none');
@@ -821,7 +826,7 @@ var ASSETS = {
     }
     // 2) landing
     var land = ev.filter(function (e) { return e.type === 'land'; });
-    caption(land.length ? 'Новые кристаллы…' : 'Новых кристаллов нет', b.color); await wait(A.B_CAPTION);
+    caption(land.length ? 'New crystals…' : 'No new crystals', b.color); await wait(A.B_CAPTION);
     if (land.length) {
       var anyBig = false;
       await Promise.all(land.map(function (e, n) {
@@ -832,7 +837,7 @@ var ASSETS = {
           return anim(g, [{ transform: 'translateY(-' + BH + 'px) scale(.6)', opacity: 0 }, { transform: 'translateY(4px) scale(1.05)', opacity: 1, offset: .7 }, { transform: 'translateY(0) scale(1)' }], A.B_LAND, { easing: 'cubic-bezier(.3,1.4,.5,1)' });
         });
       }));
-      if (anyBig) { caption('☾ Лунный свет: крупные кристаллы!', b.color); await wait(A.B_CAPTION); }
+      if (anyBig) { caption('☾ Moonlight: big crystals!', b.color); await wait(A.B_CAPTION); }
       renderFill(b.cells);
       await playCollects(ev, 'land');
     }
@@ -840,29 +845,29 @@ var ASSETS = {
     if (pe) { renderBonusCells(pe.snap); renderFill(pe.snap); }
     var enc = ev.filter(function (e) { return e.type === 'encore'; })[0];
     if (enc) {
-      caption('★ Encore! Нижний ряд очищен, коробка ×' + fx(enc.nextMult), b.color);
-      await bigMsg('Поле заполнено!', A.B_FULL * 0.7);
+      caption('★ Encore! Bottom row cleared, box ×' + fx(enc.nextMult), b.color);
+      await bigMsg('Grid full!', A.B_FULL * 0.7);
       await Promise.all([8, 9, 10, 11].map(function (i) { var g = $('bc' + i).querySelector('.slot'); return anim(g, [{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(1.3) rotate(10deg)', opacity: 0 }], A.B_ENCORE / 2); }));
       renderBonusCells(enc.snap); renderFill(enc.snap);
       [8, 9, 10, 11].forEach(function (i) { $('bc' + i).querySelector('.slot').getAnimations().forEach(function (a) { a.cancel(); }); });
       var mb3 = $('multBadge'); mb3.style.display = 'block'; mb3.textContent = 'x' + fx(enc.nextMult); classPulse(mb3, 'grow', 500);
-      await bigMsg('Encore!<br><span style="font-size:18px">Нижний ряд очищен<br>Коробка ×' + fx(enc.nextMult) + '</span>', A.B_ENCORE);
+      await bigMsg('Encore!<br><span style="font-size:18px">Bottom row cleared<br>Box ×' + fx(enc.nextMult) + '</span>', A.B_ENCORE);
     }
     var end = ev.filter(function (e) { return e.type === 'end'; })[0];
     if (end) {
       SKIP = false;
-      caption(end.reason === 'full' ? 'Поле заполнено!' : 'Бонус завершён', b.color);
-      await bigMsg(end.reason === 'full' ? 'Поле заполнено!' : 'Бонус завершён', A.B_FULL);
+      caption(end.reason === 'full' ? 'Grid full!' : 'Bonus over', b.color);
+      await bigMsg(end.reason === 'full' ? 'Grid full!' : 'Bonus over', A.B_FULL);
       showSummary(); return;
     }
-    caption('Тапни — следующий спин', b.color);
+    caption('Tap for the next spin', b.color);
     setMode('bonusIdle'); setBusy(false);
   }
   function playCollects(ev, phase) {
     var cs = ev.filter(function (e) { return e.type === 'collect' && e.phase === phase; });
     if (!cs.length) return Promise.resolve();
     var pink = col(S.bonus.color).id === 'pink', last = cs[cs.length - 1].snap;
-    caption('Попадание! В коробку' + (cs.length > 1 ? ' ×' + cs.length : ''), S.bonus.color);
+    caption('Match! Into the box' + (cs.length > 1 ? ' ×' + cs.length : ''), S.bonus.color);
     return Promise.all(cs.map(function (e, n) { return flyToBox(e, n * 110); })).then(function () {
       cs.forEach(function (e) { S.bonus.cells[e.cell] = null; }); renderFill(last);
       if (pink && last.some(Boolean)) return pinkTick(last, cs.length);
@@ -870,12 +875,11 @@ var ASSETS = {
   }
   function showSummary() {
     var b = S.bonus, st = b.run.state, cc = col(b.color);
-    $('sumCard').innerHTML = '<h1>Бонус завершён!</h1>' + gemHTML(b.color, 2, { noSize: 1 }) + '<h2>' + cc.name + ' ' + cc.icon + ' · ' + cc.mod + '</h2><table>' +
-      '<tr><td>Кристаллов собрано</td><td>' + st.collected + '</td></tr>' +
-      '<tr><td>Из банка в коробку</td><td>' + fm(b.pot) + '</td></tr>' +
-      '<tr><td>Коробка</td><td>' + fx(st.boxX) + '× ставки</td></tr>' +
-      '<tr><td style="font-size:12px;color:#b37">Спинов сыграно</td><td style="font-size:12px">' + st.spins + '</td></tr></table>' +
-      '<div>Выигрыш</div><div class="big">+' + fm(b.run.win) + '</div><div class="tapc">Тапни, чтобы забрать</div>';
+    $('sumCard').innerHTML = '<h1>Bonus complete!</h1>' + gemHTML(b.color, 2, { noSize: 1 }) + '<h2>' + cc.name + ' ' + cc.icon + ' · ' + cc.mod + '</h2><table>' +
+      '<tr><td>Crystals collected</td><td>' + st.collected + '</td></tr>' +
+      '<tr><td>Fan Box</td><td>' + fx(st.boxX) + '× bet</td></tr>' +
+      '<tr><td style="font-size:12px;color:#b37">Spins played</td><td style="font-size:12px">' + st.spins + '</td></tr></table>' +
+      '<div>You won</div><div class="big">+' + fm(b.run.win) + '</div><div class="tapc">Tap to collect</div>';
     $('ovSum').classList.add('on'); setMode('summary'); setBusy(false);
   }
   function collectBonus() {
@@ -883,7 +887,7 @@ var ASSETS = {
     S.balance = r2(S.balance + b.run.win); S.lastWin = b.run.win; S.pending = null; save(); renderInfo();
     document.body.classList.remove('inBonus'); S.bonus = null;
     dispPots = pots().slice(); renderPots(); layout();
-    caption('Бонус: +' + fm(b.run.win) + ' 🎉'); setMode('idle'); setBusy(false);
+    caption('Bonus: +' + fm(b.run.win) + ' 🎉'); setMode('idle'); setBusy(false);
   }
 
   // ---------- input ----------
@@ -906,10 +910,10 @@ var ASSETS = {
   });
   document.addEventListener('keydown', function (e) { if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); onTap(); } });
   document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
-  function openDbg() { $('dbgInfo').textContent = 'seed: ' + (SEED === null ? 'случайный' : SEED) + ' · ставка ' + bet(); $('dbgTurbo').textContent = 'Турбо: ' + (TURBO ? 'вкл' : 'выкл'); $('dbg').classList.add('on'); }
-  $('dbgReset').onclick = function () { S.balance = C.START_BALANCE; S.lastWin = 0; save(); renderInfo(); toast('Баланс: ' + C.START_BALANCE); };
-  $('dbgPots').onclick = function () { if (S.mode !== 'idle' || S.busy) return; S.pots = {}; dispPots = pots().slice(); renderPots(); save(); toast('Банки обнулены'); };
-  $('dbgTurbo').onclick = function () { TURBO = !TURBO; $('dbgTurbo').textContent = 'Турбо: ' + (TURBO ? 'вкл' : 'выкл'); };
+  function openDbg() { $('dbgInfo').textContent = 'seed: ' + (SEED === null ? 'random' : SEED) + ' · bet ' + bet(); $('dbgTurbo').textContent = 'Turbo: ' + (TURBO ? 'on' : 'off'); $('dbg').classList.add('on'); }
+  $('dbgReset').onclick = function () { S.balance = C.START_BALANCE; S.lastWin = 0; save(); renderInfo(); toast('Balance: ' + C.START_BALANCE); };
+  $('dbgPots').onclick = function () { if (S.mode !== 'idle' || S.busy) return; S.pots = {}; dispPots = pots().slice(); renderPots(); save(); toast('All jars emptied'); };
+  $('dbgTurbo').onclick = function () { TURBO = !TURBO; $('dbgTurbo').textContent = 'Turbo: ' + (TURBO ? 'on' : 'off'); };
   $('dbgClose').onclick = function () { $('dbg').classList.remove('on'); };
 
   // ---------- boot ----------
@@ -917,7 +921,7 @@ var ASSETS = {
   buildPots(); dispPots = pots().slice(); renderPots(); renderArm();
   curGrid = initialGrid(); buildReels(curGrid);
   renderInfo(); layout(); setMode('idle'); setBusy(false);
-  caption(S.armed >= 0 ? 'Бонус «' + col(S.armed).name + '» заряжен' : 'Idol Gems ✨');
+  caption(S.armed >= 0 ? col(S.armed).name + ' bonus armed' : 'Idol Gems ✨');
   window.addEventListener('resize', layout);
   // test hook (read-only state + tap)
   window.IG_UI = { state: S, tap: onTap, skip: skip };
